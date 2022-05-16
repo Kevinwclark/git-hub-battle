@@ -1,3 +1,10 @@
+
+### start up
+nvm use node 
+
+npm start
+
+
 <h1 align="center">
   <a href="https://ui.dev">
     <img
