@@ -65,6 +65,7 @@ export default class Popular extends React.Component {
           error: "There was an error fetching repos"
         })
       })
+      
   }
 
   isLoading() {
