@@ -34,10 +34,9 @@ export default class Popular extends React.Component {
 
     this.state = {
       selectedLanguage: 'All',
-      repos: null,
+      repos: {},
       error: null
     }
-    console.log('here in Popular', this)
     this.updateLanguage = this.updateLanguage.bind(this);
     this.isLoading = this.isLoading.bind(this)
   }
@@ -50,26 +49,32 @@ export default class Popular extends React.Component {
     console.log('updateLanguage', selectedLanguage)
     this.setState({ 
       selectedLanguage,
-      repos: null,
       error: null,
     });
-    fetchPopularRepos(selectedLanguage)
-      .then((repos) => this.setState({
-        repos,
-        error: null,
-      }))
-      .catch((error) => {
-        console.warn('error fetching repos: ', error)
-
-        this.setState({
-          error: "There was an error fetching repos"
+    if(!this.state.repos[selectedLanguage]){
+      fetchPopularRepos(selectedLanguage)
+        .then((data) => {
+          this.setState(({ repos }) => ({
+            repos: {
+              ...repos,
+              [selectedLanguage]: data
+            }
+          }))
         })
-      })
-      
+        .catch((error) => {
+          console.warn('error fetching repos: ', error)
+  
+          this.setState({
+            error: "There was an error fetching repos"
+          })
+        })
+    }
   }
 
+
   isLoading() {
-    return this.state.error === null && this.state.repos === null
+    const { selectedLanguage, repos, error } = this.state
+    return !repos[selectedLanguage] && error === null
   }
 
   render() {
@@ -83,7 +88,7 @@ export default class Popular extends React.Component {
         />
         {this.isLoading() && <p>LOADING</p>}
         {error && <p>{error}</p>}
-        {repos && repos.map((repo) => {
+        {repos[selectedLanguage] && repos[selectedLanguage].map((repo) => {
           return(
             <div key={repo.id}>{repo.git_url}</div>
           )
